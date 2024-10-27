@@ -21,7 +21,8 @@
      pinMode(motorKiri2Maju, OUTPUT);
      pinMode(motorKanan1Maju, OUTPUT);
      pinMode(motorKanan2Maju, OUTPUT);
-     
+     digitalWrite(enableA, HIGH); 
+     digitalWrite(enableB, HIGH); 
      delay(2000)
    }
 
