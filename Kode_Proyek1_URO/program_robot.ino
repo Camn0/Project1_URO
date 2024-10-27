@@ -1,42 +1,72 @@
-// Pin sensor
-const int sensorKiri = A0;
-const int sensorKanan = A1;
+   // Pin sensor
+   int sensorKiri = 5;
+   int sensorKanan = 6;
+   int bacaSensorKiri = 0;
+   int bacaSensorKanan = 0;
 
-// Pin motor
-const int motorKiriMaju = 5;
-const int motorKananMaju = 6;
+   // Pin motor
+   int motorKiri1Maju = 8;
+   int motorKiri2Maju = 9;
+   int motorKanan1Maju = 10;
+   int motorKanan2Maju = 11;
 
-void setup() {
-  pinMode(sensorKiri, INPUT);
-  pinMode(sensorKanan, INPUT);
-  pinMode(motorKiriMaju, OUTPUT);
-  pinMode(motorKananMaju, OUTPUT);
-}
+   // Pin enable
+   int enableA = 4;
+   int enableB = 7;
 
-void loop() {
-  int bacaSensorKiri = analogRead(sensorKiri);
-  int bacaSensorKanan = analogRead(sensorKanan);
+   void setup() {
+     pinMode(sensorKiri, INPUT);
+     pinMode(sensorKanan, INPUT);
+     pinMode(motorKiri1Maju, OUTPUT);
+     pinMode(motorKiri2Maju, OUTPUT);
+     pinMode(motorKanan1Maju, OUTPUT);
+     pinMode(motorKanan2Maju, OUTPUT);
+     
+     delay(2000)
+   }
 
-  if (bacaSensorKiri < 500) { // sensor kiri mendeteksi garis
-    belokKiri();
-  } else if (bacaSensorKanan < 500) { // sensor kanan mendeteksi garis
-    belokKanan();
-  } else {
-    majuLurus();
-  }
-}
+   void loop() {
+     int bacaSensorKiri = digitalRead(sensorKiri);
+     int bacaSensorKanan = digitalRead(sensorKanan);
 
-void belokKiri() {
-  digitalWrite(motorKiriMaju, LOW);
-  digitalWrite(motorKananMaju, HIGH);
-}
+     if (bacaSensorKiri == LOW && bacaSensorKanan == LOW) { // sensor kiri dan kanan lemah
+       majuLurus();
+     }
+     if (bacaSensorKiri == LOW && bacaSensorKanan == HIGH) { // sensor kanan mendeteksi garis
+       belokKanan();
+     }
+     if (bacaSensorKiri == HIGH && bacaSensorKanan == LOW) { // sensor kiri mendeteksi garis
+       belokKiri();
+     }
+     if (bacaSensorKiri == HIGH && bacaSensorKanan == HIGH) { // berhenti
+       berhenti();
+     }
+   }
 
-void belokKanan() {
-  digitalWrite(motorKiriMaju, HIGH);
-  digitalWrite(motorKananMaju, LOW);
-}
+   void belokKiri() {
+     digitalWrite(motorKiri1Maju, LOW);
+     digitalWrite(motorKanan1Maju, HIGH);
+     digitalWrite(motorKiri2Maju, HIGH);
+     digitalWrite(motorKanan2Maju, LOW);
+   }
 
-void majuLurus() {
-  digitalWrite(motorKiriMaju, HIGH);
-  digitalWrite(motorKananMaju, HIGH);
+   void belokKanan() {
+     digitalWrite(motorKiri1Maju, HIGH);
+     digitalWrite(motorKanan1Maju, LOW);
+     digitalWrite(motorKiri2Maju, LOW);
+     digitalWrite(motorKanan2Maju, HIGH);
+   }
+
+   void majuLurus() {
+     digitalWrite(motorKiri1Maju, HIGH);
+     digitalWrite(motorKanan1Maju, HIGH);
+     digitalWrite(motorKiri2Maju, LOW);
+     digitalWrite(motorKanan2Maju, LOW);
+   }
+
+   void berhenti() {
+     digitalWrite(motorKiri1Maju, LOW);
+     digitalWrite(motorKanan1Maju, LOW);
+     digitalWrite(motorKiri2Maju, LOW);
+     digitalWrite(motorKanan2Maju, LOW);
 }
