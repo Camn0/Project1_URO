@@ -25,8 +25,6 @@ Berikut adalah komponen perangkat keras yang dibutuhkan untuk membangun robot in
 
 Robot ini dirangkai dengan menghubungkan sensor dan motor driver ke pin-pin digital pada Arduino.
 
-*(Disarankan untuk menambahkan gambar skema Fritzing atau diagram buatan tangan di sini untuk memperjelas koneksi.)*
-
 Berikut adalah tabel koneksi pin yang digunakan dalam kode:
 
 | Komponen | Pin Komponen | Pin Arduino |
