@@ -1,4 +1,4 @@
-# README - Proyek Robot Pengikut Garis
+# Proyek Robot Pengikut Garis
 
 ## Deskripsi Singkat
 Proyek ini membuat robot pengikut garis yang menggunakan sensor inframerah (IR), motor DC dengan driver (mis. L298N), dan mikrokontroler Arduino untuk mendeteksi dan mengikuti jalur (garis) pada permukaan. Robot akan bergerak maju, belok kiri/kanan, atau berhenti berdasarkan pembacaan sensor.
