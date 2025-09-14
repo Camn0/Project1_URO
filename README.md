@@ -1,75 +1,113 @@
-# Proyek Robot Pengikut Garis
+# Proyek Robot Pengikut Garis (Line Follower) dengan Arduino
 
-## Deskripsi Singkat
-Proyek ini membuat robot pengikut garis yang menggunakan sensor inframerah (IR), motor DC dengan driver (mis. L298N), dan mikrokontroler Arduino untuk mendeteksi dan mengikuti jalur (garis) pada permukaan. Robot akan bergerak maju, belok kiri/kanan, atau berhenti berdasarkan pembacaan sensor.
+![Arduino](https://img.shields.io/badge/Arduino-UNO-blue?style=for-the-badge&logo=arduino)
+![C++](https://img.shields.io/badge/Language-C%2B%2B-blue?style=for-the-badge&logo=cplusplus)
+![Platform](https://img.shields.io/badge/Platform-Hardware-orange?style=for-the-badge)
 
-## Fitur Utama
-- Deteksi garis menggunakan dua sensor IR (kiri dan kanan).
-- Kontrol dua motor DC via motor driver.
-- Logika sederhana untuk mengikuti garis: maju, belok kiri, belok kanan, dan berhenti.
-- Contoh kode Arduino siap pakai untuk pengujian.
+Proyek ini adalah panduan lengkap untuk membangun sebuah robot pengikut garis (line follower) otonom dari awal. Robot ini menggunakan komponen dasar elektronika seperti mikrokontroler Arduino, sensor inframerah (IR), dan motor DC untuk secara otomatis mendeteksi dan mengikuti sebuah jalur (garis hitam di atas permukaan putih).
 
-## Komponen yang Dibutuhkan
-1. Arduino Uno (atau kompatibel)  
-2. Sensor Infrared (IR) x2  
-3. Motor DC x2 dan Motor Driver (mis. L298N)  
-4. Chassis (karton, akrilik, atau bahan lain)  
-5. Roda dan komponen mekanis pendukung  
-6. Kabel jumper dan breadboard  
-7. Power supply (baterai 9V atau baterai pack yang sesuai)
+## Daftar Komponen
 
-## Skema Singkat & Flow
-- Sensor kiri terhubung ke pin digital 5, sensor kanan ke pin digital 6.
-- Motor dikendalikan melalui 4 pin output (dua untuk masing-masing motor) dan dua pin enable.
-- Logika dasar:
-  - Jika kedua sensor tidak mendeteksi garis (LOW): maju lurus.
-  - Jika sensor kiri LOW & kanan HIGH: belok kanan.
-  - Jika sensor kiri HIGH & kanan LOW: belok kiri.
-  - Jika kedua sensor HIGH: berhenti.
+Berikut adalah komponen perangkat keras yang dibutuhkan untuk membangun robot ini:
 
-Flowchart singkat (teks):
-Start → Read sensor kiri & kanan →  
-- Kedua LOW → Maju  
-- Kiri LOW, Kanan HIGH → Belok kanan  
-- Kiri HIGH, Kanan LOW → Belok kiri  
-- Kedua HIGH → Berhenti  
-End
+| No. | Komponen | Jumlah | Keterangan |
+| :-- | :--- | :--- | :--- |
+| 1. | Mikrokontroler Arduino | 1 | Arduino Uno, Nano, atau yang kompatibel. |
+| 2. | Sensor Inframerah (IR) | 2 | Digunakan sebagai "mata" untuk mendeteksi garis. |
+| 3. | Motor Driver | 1 | L298N atau sejenisnya untuk mengendalikan motor DC. |
+| 4. | Motor DC + Roda | 2 | Motor DC dengan gearbox untuk torsi yang cukup. |
+| 5. | Chassis Robot | 1 | Bisa menggunakan akrilik, kayu, atau bahkan karton tebal. |
+| 6. | Roda Caster / Roda Bebas | 1 | Sebagai roda ketiga untuk keseimbangan. |
+| 7. | Power Supply | 1 | Baterai 9V atau Baterai Pack Li-ion/Li-Po (7.4V - 12V). |
+| 8. | Breadboard & Kabel Jumper | Secukupnya | Untuk merangkai sirkuit. |
 
-## Contoh Kode (Arduino)
-(Cukup ringkasan; simpan di file .ino)
+## Skema Rangkaian dan Koneksi Pin
+
+Robot ini dirangkai dengan menghubungkan sensor dan motor driver ke pin-pin digital pada Arduino.
+
+*(Disarankan untuk menambahkan gambar skema Fritzing atau diagram buatan tangan di sini untuk memperjelas koneksi.)*
+
+Berikut adalah tabel koneksi pin yang digunakan dalam kode:
+
+| Komponen | Pin Komponen | Pin Arduino |
+| :--- | :--- | :--- |
+| **Sensor IR Kiri** | `OUT` | Pin Digital `5` |
+| **Sensor IR Kanan** | `OUT` | Pin Digital `6` |
+| **Motor Driver (L298N)** | `IN1` (Motor Kiri) | Pin Digital `8` |
+| | `IN2` (Motor Kiri) | Pin Digital `9` |
+| | `IN3` (Motor Kanan)| Pin Digital `10`|
+| | `IN4` (Motor Kanan)| Pin Digital `11`|
+| | `ENA` (Enable Kiri)| Pin Digital `4` |
+| | `ENB` (Enable Kanan)| Pin Digital `7` |
+
+**Catatan:** Hubungkan pin `VCC` dan `GND` dari sensor dan motor driver ke pin `5V` dan `GND` pada Arduino. Power supply eksternal (baterai) dihubungkan ke input `V_MOTOR` dan `GND` pada motor driver.
+
+## Prinsip Kerja & Logika Kontrol
+
+Robot bekerja berdasarkan prinsip sederhana pembacaan sensor IR. Sensor IR memancarkan cahaya inframerah dan mendeteksi pantulannya.
+
+-   **Permukaan Putih:** Memantulkan banyak cahaya. Sensor akan membaca **LOW** (0).
+-   **Permukaan Hitam (Garis):** Menyerap banyak cahaya. Sensor akan membaca **HIGH** (1).
+
+Logika gerakan robot didasarkan pada kombinasi pembacaan dari kedua sensor tersebut:
+
+| Sensor Kiri (Pin 5) | Sensor Kanan (Pin 6) | Kondisi | Aksi Robot | Fungsi yang Dipanggil |
+| :---: | :---: | :--- | :--- | :--- |
+| `LOW` (Putih) | `LOW` (Putih) | Robot berada di tengah garis. | Maju Lurus | `majuLurus()` |
+| `LOW` (Putih) | `HIGH` (Hitam) | Robot terlalu ke kiri. | Belok Kanan | `belokKanan()` |
+| `HIGH` (Hitam) | `LOW` (Putih) | Robot terlalu ke kanan. | Belok Kiri | `belokKiri()` |
+| `HIGH` (Hitam) | `HIGH` (Hitam) | Robot mencapai persimpangan/akhir. | Berhenti | `berhenti()` |
+
+## Kode Program
+
+Kode lengkap untuk mengoperasikan robot dapat ditemukan di file `.ino` dalam repositori ini. Berikut adalah ringkasan fungsional dari kode tersebut.
+
 ```cpp
-// Pin sensor
-int sensorKiri = 5;
-int sensorKanan = 6;
+/*
+ * KODE LENGKAP ROBOT PENGIKUT GARIS
+ * ---------------------------------
+ * File ini berisi semua logika untuk membaca sensor IR
+ * dan menggerakkan motor DC sesuai dengan posisi robot
+ * terhadap garis.
+ */
 
-// Pin motor
-int motorKiri1Maju = 8;
-int motorKiri2Maju = 9;
-int motorKanan1Maju = 10;
-int motorKanan2Maju = 11;
+// Definisi Pin Sensor
+const int sensorKiri = 5;
+const int sensorKanan = 6;
 
-// Pin enable
-int enableA = 4;
-int enableB = 7;
+// Definisi Pin Motor Driver L298N
+const int motorKiri1 = 8;
+const int motorKiri2 = 9;
+const int motorKanan1 = 10;
+const int motorKanan2 = 11;
+const int enableA = 4; // Enable untuk motor kiri
+const int enableB = 7; // Enable untuk motor kanan
 
 void setup() {
+  // Inisialisasi semua pin sebagai INPUT atau OUTPUT
   pinMode(sensorKiri, INPUT);
   pinMode(sensorKanan, INPUT);
-  pinMode(motorKiri1Maju, OUTPUT);
-  pinMode(motorKiri2Maju, OUTPUT);
-  pinMode(motorKanan1Maju, OUTPUT);
-  pinMode(motorKanan2Maju, OUTPUT);
+  pinMode(motorKiri1, OUTPUT);
+  pinMode(motorKiri2, OUTPUT);
+  pinMode(motorKanan1, OUTPUT);
+  pinMode(motorKanan2, OUTPUT);
   pinMode(enableA, OUTPUT);
   pinMode(enableB, OUTPUT);
+
+  // Aktifkan motor driver (kecepatan penuh)
   digitalWrite(enableA, HIGH);
   digitalWrite(enableB, HIGH);
+
+  // Beri jeda 2 detik saat pertama kali dinyalakan
   delay(2000);
 }
 
 void loop() {
+  // Baca nilai digital dari kedua sensor
   int bacaSensorKiri = digitalRead(sensorKiri);
   int bacaSensorKanan = digitalRead(sensorKanan);
 
+  // Terapkan logika kontrol
   if (bacaSensorKiri == LOW && bacaSensorKanan == LOW) {
     majuLurus();
   } else if (bacaSensorKiri == LOW && bacaSensorKanan == HIGH) {
@@ -81,43 +119,32 @@ void loop() {
   }
 }
 
-void belokKiri() {
-  digitalWrite(motorKiri1Maju, LOW);
-  digitalWrite(motorKanan1Maju, HIGH);
-  digitalWrite(motorKiri2Maju, HIGH);
-  digitalWrite(motorKanan2Maju, LOW);
+// === Fungsi-Fungsi Gerakan ===
+
+void majuLurus() {
+  digitalWrite(motorKiri1, HIGH);
+  digitalWrite(motorKiri2, LOW);
+  digitalWrite(motorKanan1, HIGH);
+  digitalWrite(motorKanan2, LOW);
 }
 
 void belokKanan() {
-  digitalWrite(motorKiri1Maju, HIGH);
-  digitalWrite(motorKanan1Maju, LOW);
-  digitalWrite(motorKiri2Maju, LOW);
-  digitalWrite(motorKanan2Maju, HIGH);
+  digitalWrite(motorKiri1, HIGH); // Roda kiri maju
+  digitalWrite(motorKiri2, LOW);
+  digitalWrite(motorKanan1, LOW); // Roda kanan mundur (untuk belokan tajam)
+  digitalWrite(motorKanan2, HIGH);
 }
 
-void majuLurus() {
-  digitalWrite(motorKiri1Maju, HIGH);
-  digitalWrite(motorKanan1Maju, HIGH);
-  digitalWrite(motorKiri2Maju, LOW);
-  digitalWrite(motorKanan2Maju, LOW);
+void belokKiri() {
+  digitalWrite(motorKiri1, LOW); // Roda kiri mundur
+  digitalWrite(motorKiri2, HIGH);
+  digitalWrite(motorKanan1, HIGH); // Roda kanan maju
+  digitalWrite(motorKanan2, LOW);
 }
 
 void berhenti() {
-  digitalWrite(motorKiri1Maju, LOW);
-  digitalWrite(motorKanan1Maju, LOW);
-  digitalWrite(motorKiri2Maju, LOW);
-  digitalWrite(motorKanan2Maju, LOW);
+  digitalWrite(motorKiri1, LOW);
+  digitalWrite(motorKiri2, LOW);
+  digitalWrite(motorKanan1, LOW);
+  digitalWrite(motorKanan2, LOW);
 }
-```
-
-## Cara Menjalankan / Pengujian
-1. Rakit rangkaian sesuai penjelasan pin di atas dan datasheet motor driver.
-2. Sambungkan sensor ke permukaan berwarna kontras (mis. garis hitam di atas latar putih).
-3. Hidupkan power supply, upload sketsa ke Arduino.
-4. Uji dan kalibrasi posisi sensor serta kecepatan motor sesuai kebutuhan.
-
-## Tips & Troubleshooting
-- Pastikan sensor IR diposisikan dekat ke permukaan (jarak kerja beberapa mm).
-- Jika robot terlalu sering melewatkan garis, kurangi kecepatan motor (PWM pada pin enable).
-- Periksa pengkabelan motor driver jika motor tidak berputar atau berputar balik.
-- Gunakan filter perangkat lunak (debouncing atau pembacaan rata-rata) jika sensor menghasilkan noise.
